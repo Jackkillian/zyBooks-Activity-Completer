@@ -25,11 +25,11 @@ def nav_to_section(driver, ch, sec):
 
 def complete_all(driver):
     try:
-        # playAnimations(driver)
+        playAnimations(driver)
         completeCustomInteractions(driver)
-        # completeMultipleChoice(driver)
-        # completeShortAnswer(driver)
-        # completeMatching(driver)
+        completeMultipleChoice(driver)
+        completeShortAnswer(driver)
+        completeMatching(driver)
         # completeSelectionProblems(driver)
     except Exception as err:
         print(f"GOT ERR COMPLETING PARTICIPATION: {err}")
@@ -76,6 +76,7 @@ def playAnimations(driver):
                 break
         print("Completed animation activity")
 
+# WORKS
 def completeCustomInteractions(driver):
     custom_activties = driver.find_elements(By.CSS_SELECTOR, ".content-tool-content-resource.interactive-activity-container.participation")
 
@@ -133,32 +134,30 @@ def completeMultipleChoice(driver):
 
         print("Completed multiple choice set")
 
+# WORKS
 def completeShortAnswer(driver):
-    short_answer_sets = driver.find_elements_by_xpath(
-        "//div[@class='interactive-activity-container short-answer-content-resource participation large ember-view']")
-    short_answer_sets += driver.find_elements_by_xpath(
-        "//div[@class='interactive-activity-container short-answer-content-resource participation medium ember-view']")
-    short_answer_sets += driver.find_elements_by_xpath(
-        "//div[@class='interactive-activity-container short-answer-content-resource participation small ember-view']")
+    short_answer_sets = driver.find_elements(By.CSS_SELECTOR, ".short-answer-content-resource.interactive-activity-container.participation")
+
     for question_set in short_answer_sets:
         if checkCompleted(question_set):
             print("Skipping completed short answer activity")
             continue
-        driver.find_element_by_xpath("//div[@class='section-header-row']").click()
+        
         questions = question_set.find_elements_by_xpath(
             ".//div[@class='question-set-question short-answer-question ember-view']")
+        
         for question in questions:
-            show_answer_button = question.find_element_by_css_selector(
-                "button.zb-button.secondary.false.show-answer-button")
+            show_answer_button = question.find_element(By.CSS_SELECTOR, ".zb-button.secondary.show-answer-button")
             show_answer_button.click()
             show_answer_button.click()
-            answer = question.find_element_by_xpath(".//span[@class='forfeit-answer']").text
-            text_area = question.find_element_by_css_selector(
-                "textarea.ember-text-area.ember-view.zb-text-area.hide-scrollbar")
+
+            answer = question.find_element(By.XPATH, ".//span[@class='forfeit-answer']").text
+            text_area = question.find_element(By.XPATH, ".//input[@class='zb-input']")
             text_area.send_keys(answer)
-            check_button = question.find_element_by_css_selector(
-                "button.zb-button.primary.false.check-button")
+
+            check_button = question.find_element(By.CSS_SELECTOR, ".zb-button.primary.raised.check-button")
             check_button.click()
+
         print("Completed short answer set")
 
 # WORKS - with supervision...
