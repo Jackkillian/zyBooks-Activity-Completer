@@ -6,9 +6,17 @@ from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from time import sleep
+import os
+from dotenv import load_dotenv
+
+def get_base_url():
+    url = os.getenv("COURSE_URL")
+    if not url.endswith("/"):
+        url += "/"
+    return url
 
 def nav_to_section(driver, ch, sec):
-    driver.get(f"https://learn.zybooks.com/zybook/MSTCOMPSCI1500Fall2025/chapter/{ch}/section/{sec}")
+    driver.get(f"{get_base_url()}chapter/{ch}/section/{sec}")
     WebDriverWait(driver, 10).until(
         expected_conditions.visibility_of_element_located(
             (By.CSS_SELECTOR, ".zb-card.zybook-section")
@@ -266,15 +274,15 @@ def completeProgressionChallenges(driver):  # Currently not used
                 next_button.click()
     return
 
-geckodriver_path = './geckodriver'
+load_dotenv()
+
+geckodriver_path = os.getenv("DRIVER_PATH")
 options = Options()
 options.headless = False
 options.add_argument("-devtools")
 skip_completed = True
 
-PATH_TO_FIREFOX_PROFILE = ""
-
-fp = webdriver.FirefoxProfile(PATH_TO_FIREFOX_PROFILE)
+fp = webdriver.FirefoxProfile(os.getenv("FIREFOX_PROFILE"))
 driver = webdriver.Firefox(firefox_profile=fp, executable_path=geckodriver_path, options=options)
 
 chapter = int(input("Chapter: "))
