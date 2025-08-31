@@ -25,11 +25,11 @@ def nav_to_section(driver, ch, sec):
 
 def complete_all(driver):
     try:
-        playAnimations(driver)
-        # completeCustomInteractions(driver)
-        completeMultipleChoice(driver)
+        # playAnimations(driver)
+        completeCustomInteractions(driver)
+        # completeMultipleChoice(driver)
         # completeShortAnswer(driver)
-        completeMatching(driver)
+        # completeMatching(driver)
         # completeSelectionProblems(driver)
     except Exception as err:
         print(f"GOT ERR COMPLETING PARTICIPATION: {err}")
@@ -77,18 +77,18 @@ def playAnimations(driver):
         print("Completed animation activity")
 
 def completeCustomInteractions(driver):
-    custom_activties = driver.find_elements_by_xpath(
-        "//div[@class='interactive-activity-container custom-content-resource participation large ember-view']")
-    custom_activties += driver.find_elements_by_xpath(
-        "//div[@class='interactive-activity-container custom-content-resource participation medium ember-view']")
-    custom_activties += driver.find_elements_by_xpath(
-        "//div[@class='interactive-activity-container custom-content-resource participation small ember-view']")
+    custom_activties = driver.find_elements(By.CSS_SELECTOR, ".content-tool-content-resource.interactive-activity-container.participation")
+
+    print(f"FOUND {len(custom_activties)} CUSTOM ACTIVITIES")
+
     for activity in custom_activties:
         if checkCompleted(activity):
             print("Skipping completed interactive activity")
             continue
+
         driver.find_element_by_xpath("//div[@class='section-header-row']").click()
-        buttons = activity.find_elements_by_xpath(".//button[@class='button']")
+
+        buttons = activity.find_element(By.CSS_SELECTOR, ".activity-payload").find_elements_by_xpath(".//button")
         for button in buttons:
             button.click()
 
@@ -282,9 +282,6 @@ options.headless = False
 options.add_argument("-devtools")
 skip_completed = True
 
-fp = webdriver.FirefoxProfile(os.getenv("FIREFOX_PROFILE"))
-driver = webdriver.Firefox(firefox_profile=fp, executable_path=geckodriver_path, options=options)
-
 chapter = int(input("Chapter: "))
 std_sections = input("Section(s): ")
 
@@ -295,6 +292,9 @@ elif "-" in std_sections:
     sections = [i for i in range(int(start), int(end) + 1)]
 else:
     sections = [int(std_sections)]
+
+fp = webdriver.FirefoxProfile(os.getenv("FIREFOX_PROFILE"))
+driver = webdriver.Firefox(firefox_profile=fp, executable_path=geckodriver_path, options=options)
 
 for section in sections:
     print(f"Completing {chapter}.{section}")
