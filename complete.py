@@ -95,8 +95,6 @@ def completeCustomInteractions(driver):
 
 # WORKS
 def completeMultipleChoice(driver):
-    print("COMPLETING MULT CHOICE")
-    
     multiple_choice_sets = driver.find_elements(By.CLASS_NAME, "multiple-choice-payload")
 
     print(f"FOUND {len(multiple_choice_sets)} MULT CHOICE")
@@ -138,21 +136,26 @@ def completeMultipleChoice(driver):
 def completeShortAnswer(driver):
     short_answer_sets = driver.find_elements(By.CSS_SELECTOR, ".short-answer-content-resource.interactive-activity-container.participation")
 
+    print(f"FOUND {len(short_answer_sets)} SHORT ANSWER SETS")
+
     for question_set in short_answer_sets:
         if checkCompleted(question_set):
             print("Skipping completed short answer activity")
             continue
         
-        questions = question_set.find_elements_by_xpath(
-            ".//div[@class='question-set-question short-answer-question ember-view']")
+        questions = question_set.find_elements(By.CSS_SELECTOR, ".question-set-question.short-answer-question")
+        
+        print(f"FOUND {len(questions)} QUESTIONS IN SET")
         
         for question in questions:
             show_answer_button = question.find_element(By.CSS_SELECTOR, ".zb-button.secondary.show-answer-button")
             show_answer_button.click()
             show_answer_button.click()
 
-            answer = question.find_element(By.XPATH, ".//span[@class='forfeit-answer']").text
-            text_area = question.find_element(By.XPATH, ".//input[@class='zb-input']")
+            answer = question.find_element(By.CSS_SELECTOR, ".forfeit-answer").text
+            text_area = question.find_element(By.CSS_SELECTOR, ".zb-input")
+
+            # print(f"Completing question - answer: {answer}")
             text_area.send_keys(answer)
 
             check_button = question.find_element(By.CSS_SELECTOR, ".zb-button.primary.raised.check-button")
@@ -279,7 +282,7 @@ geckodriver_path = os.getenv("DRIVER_PATH")
 options = Options()
 options.headless = False
 options.add_argument("-devtools")
-skip_completed = True
+skip_completed = False
 
 chapter = int(input("Chapter: "))
 std_sections = input("Section(s): ")
