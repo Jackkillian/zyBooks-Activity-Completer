@@ -56,6 +56,7 @@ def playAnimations(driver):
         if checkCompleted(animation):
             print("Skipping completed animation activity")
             continue
+
         # crumbs = driver.find_element_by_css_selector("li.bread-crumb")
         start = driver.find_element_by_css_selector("div.section-header-row")
         driver.execute_script("arguments[0].click();",
@@ -153,7 +154,11 @@ def completeShortAnswer(driver):
             show_answer_button.click()
 
             answer = question.find_element(By.CSS_SELECTOR, ".forfeit-answer").text
-            text_area = question.find_element(By.CSS_SELECTOR, ".zb-input")
+
+            try:
+                text_area = question.find_element(By.CSS_SELECTOR, ".zb-input")
+            except:
+                text_area = question.find_element(By.CSS_SELECTOR, ".zb-textarea")
 
             # print(f"Completing question - answer: {answer}")
             text_area.send_keys(answer)
@@ -185,11 +190,13 @@ def completeMatching(driver):
         except NoSuchElementException:
             pass
 
+        print("test")
+
         matching.click()
         rows = matching.find_elements_by_class_name("definition-row")
 
         for row in rows:
-            print(f"Handling {row.text}")
+            # print(f"Handling {row.text}")
             while True:
                 draggable = matching.find_element(By.CSS_SELECTOR, ".zb-sortable-item.definition-match-term")
                 bucket = row.find_element_by_class_name("term-bucket")
@@ -281,7 +288,7 @@ load_dotenv()
 geckodriver_path = os.getenv("DRIVER_PATH")
 options = Options()
 options.headless = False
-options.add_argument("-devtools")
+# options.add_argument("-devtools")
 skip_completed = False
 
 chapter = int(input("Chapter: "))
